@@ -4,9 +4,9 @@ import * as Yup from 'yup';
 
 import Dev from '../models/Dev';
 import { Point } from '../models/utils/PointSchema';
-import parseStringAsArray from '../utils/parseStringAsArray';
+import { parseStringAsArray, validateRoutePayload } from '../utils';
 
-interface PostDevs {
+interface StorePayload {
   github_username: string;
   techs: string;
   longitude: number;
@@ -28,15 +28,15 @@ class DevController {
       longitude: Yup.number().required(),
     });
 
-    try {
-      await schema.validate(req.body, { abortEarly: false, strict: true });
-    } catch (err) {
-      const yupError: Yup.ValidationError = err;
-      const errors = yupError.inner.map(e => e.message);
-      return res.status(400).json({ errors });
-    }
+    const errors = await validateRoutePayload(schema, req);
+    if (errors) return res.status(400).json({ errors });
 
-    const { github_username, techs, longitude, latitude }: PostDevs = req.body;
+    const {
+      techs,
+      github_username,
+      longitude,
+      latitude,
+    }: StorePayload = req.body;
 
     let dev = await Dev.findOne({ github_username });
 

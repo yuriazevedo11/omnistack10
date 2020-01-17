@@ -20,6 +20,7 @@ module.exports = {
     'class-methods-use-this': 'off',
     'no-param-reassign': 'off',
     'no-unused-vars': ['error', { argsIgnorePattern: 'next' }],
+    'import/prefer-default-export': 'off',
     'import/extensions': [
       'error',
       'ignorePackages',
