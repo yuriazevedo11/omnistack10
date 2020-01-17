@@ -12,6 +12,12 @@ interface PostDevs {
 }
 
 class DevController {
+  async index(_req: Request, res: Response) {
+    const devs = await Dev.find();
+
+    return res.json(devs);
+  }
+
   async store(req: Request, res: Response) {
     const { github_username, techs, longitude, latitude }: PostDevs = req.body;
 
