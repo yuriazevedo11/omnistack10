@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 
 import Dev from '../models/Dev';
 import { Point } from '../models/utils/PointSchema';
+import parseStringAsArray from '../utils/parseStringAsArray';
 
 interface PostDevs {
   github_username: string;
@@ -30,7 +31,7 @@ class DevController {
 
       const { name, avatar_url, bio } = response.data;
 
-      const techsArray = techs.split(',').map(tech => tech.trim());
+      const techsArray = parseStringAsArray(techs);
 
       const location: Point = {
         type: 'Point',

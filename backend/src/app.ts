@@ -23,6 +23,7 @@ class App {
     mongoose.connect(
       'mongodb+srv://master:admin@cluster0-vur0v.mongodb.net/test?retryWrites=true&w=majority',
       {
+        useCreateIndex: true,
         useNewUrlParser: true,
         useUnifiedTopology: true,
       }
