@@ -1,9 +1,9 @@
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
+
+import DevController from './controllers/DevController';
 
 const routes = Router();
 
-routes.get('/', (_req: Request, res: Response) => {
-  return res.json({ message: 'Hello Omnistack' });
-});
+routes.post('/devs', DevController.store);
 
 export default routes;
