@@ -10,7 +10,7 @@ interface GetSearch {
 }
 
 class SearchController {
-  async index(req: Request, res: Response) {
+  public async index(req: Request, res: Response) {
     const { latitude, longitude, techs }: GetSearch = req.body;
 
     const techsArray = parseStringAsArray(techs);
