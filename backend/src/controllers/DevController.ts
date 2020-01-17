@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Request, Response } from 'express';
+import * as Yup from 'yup';
 
 import Dev from '../models/Dev';
 import { Point } from '../models/utils/PointSchema';
@@ -20,6 +21,21 @@ class DevController {
   }
 
   public async store(req: Request, res: Response) {
+    const schema = Yup.object().shape({
+      techs: Yup.string().required(),
+      github_username: Yup.string().required(),
+      latitude: Yup.number().required(),
+      longitude: Yup.number().required(),
+    });
+
+    try {
+      await schema.validate(req.body, { abortEarly: false, strict: true });
+    } catch (err) {
+      const yupError: Yup.ValidationError = err;
+      const errors = yupError.inner.map(e => e.message);
+      return res.status(400).json({ errors });
+    }
+
     const { github_username, techs, longitude, latitude }: PostDevs = req.body;
 
     let dev = await Dev.findOne({ github_username });
