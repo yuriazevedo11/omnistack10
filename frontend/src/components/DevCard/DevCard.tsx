@@ -1,22 +1,27 @@
 import React from 'react';
 
+import { Dev } from '../../types';
+
 import './DevCard.scss';
 
-const DevCard: React.FC = () => (
+interface Props {
+  data: Dev;
+}
+
+const DevCard: React.FC<Props> = ({
+  data: { avatar_url, bio, github_username, techs },
+}) => (
   <li className="dev-card">
     <header>
-      <img
-        src="https://avatars3.githubusercontent.com/u/51724047?s=400&u=241c0719559f8bb30c8c71e95a0fbd5ac46b3d69&v=4"
-        alt="Yuri Azevedo"
-      />
+      <img src={avatar_url} alt={github_username} />
 
       <div className="user-info">
-        <strong>Yuri Azevedo</strong>
-        <span>ReactJS React Native</span>
+        <strong>{github_username}</strong>
+        <span>{techs.join(', ')}</span>
       </div>
     </header>
 
-    <p>Desenvolvedor Front-end Web e Mobile.</p>
+    <p>{bio}</p>
     <a
       target="_blank"
       rel="noopener noreferrer"

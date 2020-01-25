@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 
-import './Sidebar.scss';
 import InputField from '../InputField';
+import { NewDev } from '../../types';
 
-const Sidebar: React.FC = () => {
+import './Sidebar.scss';
+
+interface Props {
+  onSubmit: (arg0: NewDev) => Promise<void>;
+}
+
+const Sidebar: React.FC<Props> = ({ onSubmit }) => {
   const [githubUsername, setGithubUsername] = useState('');
   const [techs, setTechs] = useState('');
   const [latitude, setLatitude] = useState('');
@@ -39,10 +45,24 @@ const Sidebar: React.FC = () => {
     );
   }, []);
 
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    await onSubmit({
+      github_username: githubUsername,
+      techs,
+      latitude,
+      longitude,
+    });
+
+    setGithubUsername('');
+    setTechs('');
+  }
+
   return (
     <aside className="sidebar">
       <strong>Cadastrar</strong>
-      <form onSubmit={e => e.preventDefault()}>
+      <form onSubmit={handleSubmit}>
         <InputField
           id="github_username"
           name="github_username"
