@@ -28,7 +28,7 @@ class DevController {
       longitude: Yup.number().required(),
     });
 
-    const errors = await validateRoutePayload(schema, req);
+    const errors = await validateRoutePayload(schema, req.body);
     if (errors) return res.status(400).json({ errors });
 
     const {

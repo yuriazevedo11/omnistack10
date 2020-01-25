@@ -18,10 +18,10 @@ class SearchController {
       techs: Yup.string().required(),
     });
 
-    const errors = await validateRoutePayload(schema, req);
+    const errors = await validateRoutePayload(schema, req.query);
     if (errors) return res.status(400).json({ errors });
 
-    const { latitude, longitude, techs }: IndexPayload = req.body;
+    const { latitude, longitude, techs }: IndexPayload = req.query;
 
     const techsArray = parseStringAsArray(techs);
 

@@ -1,20 +1,20 @@
 import { ValidationError, ObjectSchema } from 'yup';
-import { Request } from 'express';
 
 type Errors = string[] | null;
 
 const validateRoutePayload = async (
   schema: ObjectSchema,
-  req: Request
+  payload: object
 ): Promise<Errors> => {
   try {
-    await schema.validate(req.body, {
+    await schema.validate(payload, {
       abortEarly: false,
-      strict: true,
     });
+
     return null;
   } catch (err) {
     const yupError: ValidationError = err;
+
     return yupError.inner.map(e => e.message);
   }
 };
