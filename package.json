@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "bootstrap": "yarn && lerna bootstrap"
+  },
+  "dependencies": {
+    "lerna": "^3.20.2"
+  },
+  "name": "omnistack10"
+}
