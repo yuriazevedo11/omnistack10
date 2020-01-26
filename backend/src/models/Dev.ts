@@ -2,7 +2,7 @@ import { model, Schema, Document } from 'mongoose';
 
 import PointSchema, { Point } from './utils/PointSchema';
 
-interface Dev extends Document {
+export interface Dev {
   name?: string;
   bio?: string;
   avatar_url?: string;
@@ -11,7 +11,9 @@ interface Dev extends Document {
   location: Point;
 }
 
-const DevSchema = new Schema({
+type DevModel = Document & Dev;
+
+const DevSchema = new Schema<Dev>({
   name: String,
   bio: String,
   avatar_url: String,
@@ -23,4 +25,4 @@ const DevSchema = new Schema({
   },
 });
 
-export default model<Dev>('Dev', DevSchema);
+export default model<DevModel>('Dev', DevSchema);

@@ -8,6 +8,7 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 
 import api from '../../services/api';
+import { connect, disconnect, subcribeToNewDevs } from '../../services/socket';
 import { MapMarker } from '../../components';
 import { Navigation, Dev } from '../../types';
 
@@ -55,6 +56,18 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
     loadInitialPosition();
   }, []);
 
+  useEffect(() => {
+    subcribeToNewDevs((dev: Dev) => setDevs([...devs, dev]));
+  }, [devs]);
+
+  const setupWebsocket = () => {
+    disconnect();
+
+    const { latitude, longitude } = currentPosition;
+
+    connect(latitude, longitude, techs);
+  };
+
   async function loadDevs() {
     if (!techs) return;
 
@@ -72,6 +85,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
 
     setLoading(false);
     setDevs(response.data);
+    setupWebsocket();
   }
 
   if (!hasPermission) {
@@ -106,6 +120,7 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
       <MapContainer
         initialRegion={currentPosition}
         onRegionChangeComplete={setCurrentPosition}
+        showsCompass={false}
       >
         {devs.map(dev => (
           <MapMarker key={dev._id} navigation={navigation} data={dev} />

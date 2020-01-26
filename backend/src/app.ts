@@ -1,14 +1,21 @@
+import http from 'http';
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 
+import { setupWebsocket } from './websocket';
 import routes from './routes';
 
 class App {
   public express: express.Application;
 
+  public server: http.Server;
+
   public constructor() {
     this.express = express();
+    this.server = new http.Server(this.express);
+    setupWebsocket(this.server);
+
     this.middlewares();
     this.database();
     this.routes();
@@ -35,4 +42,4 @@ class App {
   }
 }
 
-export default new App().express;
+export default new App().server;

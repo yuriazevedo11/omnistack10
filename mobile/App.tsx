@@ -1,7 +1,9 @@
 import React from 'react';
-import { StatusBar } from 'react-native';
+import { StatusBar, YellowBox } from 'react-native';
 
 import AppContainer from './src/routes/AppContainer';
+
+YellowBox.ignoreWarnings(['Unrecognized WebSocket']);
 
 const App: React.FC = () => (
   <>

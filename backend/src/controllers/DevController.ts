@@ -5,6 +5,7 @@ import * as Yup from 'yup';
 import Dev from '../models/Dev';
 import { Point } from '../models/utils/PointSchema';
 import { parseStringAsArray, validateRoutePayload } from '../utils';
+import { findConnections, sendMessage } from '../websocket';
 
 interface StorePayload {
   github_username: string;
@@ -62,6 +63,17 @@ class DevController {
         bio,
         location,
       });
+
+      /**
+       * Websocket
+       */
+
+      const sendSocketMessageTo = findConnections(
+        { latitude, longitude },
+        techsArray
+      );
+
+      sendMessage(sendSocketMessageTo, 'new-dev', dev);
     }
 
     return res.json(dev);
