@@ -1,27 +1,40 @@
 import React, { useEffect, useState } from 'react';
-import { Marker, Callout } from 'react-native-maps';
+import { Keyboard, ActivityIndicator } from 'react-native';
+import { Region } from 'react-native-maps';
 import {
   requestPermissionsAsync,
   getCurrentPositionAsync,
 } from 'expo-location';
+import { MaterialIcons } from '@expo/vector-icons';
 
-import { Navigation } from '../../types';
+import api from '../../services/api';
+import { MapMarker } from '../../components';
+import { Navigation, Dev } from '../../types';
 
 import {
   MapContainer,
-  Avatar,
-  DevInfo,
-  DevName,
-  DevBio,
-  DevTechs,
+  SearchForm,
+  SearchInput,
+  SearchButton,
 } from './MainScreen.styles';
 
 interface Props {
   navigation: Navigation;
 }
 
+const INITIAL_POSITION: Region = {
+  latitude: 0,
+  longitude: 0,
+  latitudeDelta: 0.04,
+  longitudeDelta: 0.04,
+};
+
 const MainScreen: React.FC<Props> = ({ navigation }) => {
-  const [currentPosition, setCurrentPosition] = useState();
+  const [currentPosition, setCurrentPosition] = useState(INITIAL_POSITION);
+  const [hasPermission, setHasPermission] = useState(false);
+  const [devs, setDevs] = useState<Dev[]>([]);
+  const [techs, setTechs] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function loadInitialPosition() {
@@ -33,46 +46,72 @@ const MainScreen: React.FC<Props> = ({ navigation }) => {
         });
 
         const { latitude, longitude } = coords;
-        const delta = 0.04;
 
-        setCurrentPosition({
-          latitude,
-          longitude,
-          latitudeDelta: delta,
-          longitudeDelta: delta,
-        });
+        setCurrentPosition(oldState => ({ ...oldState, latitude, longitude }));
+        setHasPermission(true);
       }
     }
 
     loadInitialPosition();
   }, []);
 
-  if (!currentPosition) {
+  async function loadDevs() {
+    if (!techs) return;
+
+    const { latitude, longitude } = currentPosition;
+    Keyboard.dismiss();
+    setLoading(true);
+
+    const response = await api.get<Dev[]>('/search', {
+      params: {
+        latitude,
+        longitude,
+        techs,
+      },
+    });
+
+    setLoading(false);
+    setDevs(response.data);
+  }
+
+  if (!hasPermission) {
     return null;
   }
 
   return (
-    <MapContainer initialRegion={currentPosition}>
-      <Marker coordinate={{ latitude: -22.893278, longitude: -43.269732 }}>
-        <Avatar
-          source={{
-            uri: 'https://avatars0.githubusercontent.com/u/51724047?s=460&v=4',
-          }}
+    <>
+      <SearchForm>
+        <SearchInput
+          editable={!loading}
+          placeholder="Buscar devs por techs..."
+          placeholderTextColor="#999"
+          autoCapitalize="words"
+          returnKeyType="send"
+          onSubmitEditing={loadDevs}
+          autoCorrect={false}
+          onChangeText={setTechs}
+          value={techs}
+          autoFocus
         />
 
-        <Callout
-          onPress={() =>
-            navigation.navigate('Profile', { github_username: 'yuriazevedo11' })
-          }
-        >
-          <DevInfo>
-            <DevName>Yuri Azevedo</DevName>
-            <DevBio>Desenvolvedor Front-end Web e Mobile</DevBio>
-            <DevTechs>ReactJS, React Native</DevTechs>
-          </DevInfo>
-        </Callout>
-      </Marker>
-    </MapContainer>
+        <SearchButton onPress={loadDevs} disabled={loading}>
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <MaterialIcons name="my-location" size={20} color="#FFF" />
+          )}
+        </SearchButton>
+      </SearchForm>
+
+      <MapContainer
+        initialRegion={currentPosition}
+        onRegionChangeComplete={setCurrentPosition}
+      >
+        {devs.map(dev => (
+          <MapMarker key={dev._id} navigation={navigation} data={dev} />
+        ))}
+      </MapContainer>
+    </>
   );
 };
 
